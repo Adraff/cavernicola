@@ -1,0 +1,59 @@
+{
+  "name": "cavernicola",
+  "version": "2.0.0",
+  "description": "Modo de respuesta breve en español. Acorta la prosa y conserva términos técnicos, código, comandos y errores exactos. Fork de juliusbrussee/caveman.",
+  "author": {
+    "name": "Adraff",
+    "url": "https://github.com/Adraff"
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "command -v node >/dev/null 2>&1 || exit 0; HOOK_ROOT=$(printf %s \"${CLAUDE_PLUGIN_ROOT}\" | sed 's|^/\\([a-zA-Z]\\)/|\\1:/|'); node \"$HOOK_ROOT/src/hooks/cavernicola-activate.js\"",
+            "timeout": 30,
+            "statusMessage": "Cargando modo cavernícola..."
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "command -v node >/dev/null 2>&1 || exit 0; HOOK_ROOT=$(printf %s \"${CLAUDE_PLUGIN_ROOT}\" | sed 's|^/\\([a-zA-Z]\\)/|\\1:/|'); node \"$HOOK_ROOT/src/hooks/cavernicola-activate.js\" --subagent",
+            "timeout": 30,
+            "statusMessage": "Cargando modo cavernícola para el subagente..."
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "command -v node >/dev/null 2>&1 || exit 0; HOOK_ROOT=$(printf %s \"${CLAUDE_PLUGIN_ROOT}\" | sed 's|^/\\([a-zA-Z]\\)/|\\1:/|'); node \"$HOOK_ROOT/src/hooks/cavernicola-mode-tracker.js\"",
+            "timeout": 30,
+            "statusMessage": "Siguiendo el modo cavernícola..."
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "command -v node >/dev/null 2>&1 || exit 0; HOOK_ROOT=$(printf %s \"${CLAUDE_PLUGIN_ROOT}\" | sed 's|^/\\([a-zA-Z]\\)/|\\1:/|'); node \"$HOOK_ROOT/src/hooks/cavernicola-stats.js\" --record",
+            "timeout": 5,
+            "statusMessage": "Guardando estadísticas de cavernícola..."
+          }
+        ]
+      }
+    ]
+  }
+}

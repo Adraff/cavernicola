@@ -1,0 +1,17 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "cavernicola",
+  "description": "Modo de respuesta breve en español. Acorta la prosa y conserva términos técnicos, código, comandos y errores exactos. Fork de juliusbrussee/caveman.",
+  "owner": {
+    "name": "Adraff",
+    "url": "https://github.com/Adraff"
+  },
+  "plugins": [
+    {
+      "name": "cavernicola",
+      "description": "Habla como cavernícola en español. Sin relleno. Detalles técnicos intactos.",
+      "source": "./",
+      "category": "productivity"
+    }
+  ]
+}

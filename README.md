@@ -1,6 +1,6 @@
 # 🪨 cavernicola
 
-> **Fork de / Fork of [juliusbrussee/caveman](https://github.com/juliusbrussee/caveman).** Adaptación al español de la skill *caveman* para Claude. / Spanish adaptation of the *caveman* Claude skill.
+> **Fork de / Fork of [juliusbrussee/caveman](https://github.com/juliusbrussee/caveman).** Adaptación al español del plugin *caveman* para Claude Code. / Spanish adaptation of the *caveman* Claude Code plugin.
 
 [Español](#español) · [English](#english)
 
@@ -8,53 +8,84 @@
 
 ## Español
 
-**cavernicola** es una skill para Claude que hace que responda en español **breve y directo**, para gastar menos tokens sin perder contenido técnico.
+**cavernicola** es un plugin para Claude Code que hace que Claude responda en español **breve y directo**: respuesta primero, sin relleno, con todo el contenido técnico intacto. Además trae herramientas para commits, revisiones de código, compresión de archivos de memoria y agentes que devuelven resultados comprimidos.
 
 ### Origen y autoría
 
-Este proyecto es una **adaptación derivada (fork) de [juliusbrussee/caveman](https://github.com/juliusbrussee/caveman)**, licenciado bajo Apache-2.0. El **porteo al español está hecho 100 % por Claude** (Anthropic).
+Este proyecto es un **fork de [juliusbrussee/caveman](https://github.com/juliusbrussee/caveman)** (versión 4.1.0), con licencia Apache-2.0. Todo el crédito de la idea y del código original es de Julius Brussee. El porteo al español lo hizo Claude (Anthropic).
 
-Aclaraciones:
-- No es un fork de GitHub con historial compartido: es una reescritura independiente.
-- Se hizo a partir de la descripción pública del README del proyecto original. **No se leyó su `SKILL.md`**, así que las reglas son una interpretación y pueden diferir de las originales.
-- Todo el crédito de la idea original es de su autor. Este repo conserva la licencia Apache-2.0 (ver `LICENSE` y `NOTICE`).
-- Solo se porta la parte de la voz concisa ("say less"). Las demás herramientas del proyecto original (compresión de logs, proxy, CLI, etc.) **no** están incluidas.
+Qué se tomó del original:
+- Las skills de voz, commit, revisión, ayuda, estadísticas, compresión y exploración, y la skill de la cuadrilla.
+- Los 3 agentes de la cuadrilla.
+- Los hooks de Node.js que activan el modo al abrir la sesión y guardan el modo de cada sesión, y los scripts de la barra de estado.
+- El script de compresión en Python, con su validación y su detección de secretos.
+- Los tests correspondientes, adaptados.
 
-### Instalación
+Qué cambió:
+- Todos los textos de las skills y los agentes están reescritos en español, con reglas y ejemplos pensados para el español (artículos, muletillas, rodeos).
+- Los hooks entienden frases en español: "modo cavernícola", "sé conciso", "sin relleno", "basta cavernícola", "modo normal"... También siguen entendiendo las frases en inglés.
+- El modo `megacave` (chino clásico) se quitó porque no aplica al español.
+- Los nombres cambiaron para no chocar con caveman: archivos `.cavernicola-*`, variables `CAVERNICOLA_*` y config en `~/.config/cavernicola/`.
 
-Copia la carpeta `skills/cavernicola` a tu carpeta de skills. En Claude Code, por ejemplo:
+Qué **no** se incluye: el proxy, el motor, la CLI, la extensión de navegador, el servicio en la nube (Caveman Cloud), las integraciones con otros editores (Cursor, Codex, Gemini, opencode…) ni el instalador independiente. Son infraestructura, no texto, y no tiene sentido traducirlos.
 
-```bash
-git clone https://github.com/Adraff/cavernicola
-mkdir -p ~/.claude/skills
-cp -r cavernicola/skills/cavernicola ~/.claude/skills/
+### Instalación (Claude Code)
+
+Requiere [Node.js](https://nodejs.org) 18 o superior para los hooks, y Python 3 para `/cavernicola-comprimir`.
+
+En Claude Code:
+
+```
+/plugin marketplace add Adraff/cavernicola
+/plugin install cavernicola@cavernicola
 ```
 
-### Uso
+Reinicia la sesión. El modo cavernícola se activa solo al empezar.
+
+> Si también tienes **caveman** instalado, desactívalo. Si no, los dos plugins le dan instrucciones al modelo al mismo tiempo.
+
+### Comandos
 
 | Comando | Qué hace |
 |---|---|
-| `/cavernicola` | Activa el modo estándar |
-| `/cavernicola extremo` | Activa el modo extremo |
-| `/cavernicola status` | Muestra el nivel activo |
-| `/cavernicola off` | Vuelve al estilo normal (también: "modo normal") |
+| `/cavernicola` | Activa la voz cavernícola (por defecto) |
+| `/cavernicola extremo` o `/cavernicola-extremo` | Compresión máxima: fragmentos, cada dato una vez |
+| `/cavernicola status` (o `estado`) | Muestra el modo activo |
+| `/cavernicola off` | Apaga el modo (también: "basta cavernícola", "modo normal") |
+| `/cavernicola-commit` | Mensaje de commit breve (Conventional Commits, en español) |
+| `/cavernicola-revision` | Revisión de código: una línea por hallazgo |
+| `/cavernicola-comprimir <archivo>` | Comprime un `.md` (por ejemplo `CLAUDE.md`) y guarda una copia legible |
+| `/cavernicola-stats` | Tokens de salida registrados en la sesión, por modo |
+| `/cavernicola-ayuda` | Tarjeta de referencia |
 
-También se activa con frases como "modo cavernícola", "sé conciso" o "sin relleno".
+También se activa con frases como "modo cavernícola", "habla como cavernícola", "sé conciso" o "sin relleno".
 
-### Reglas principales
+**Agentes de la cuadrilla:** `cuadrilla-investigador` busca código y devuelve `ruta:línea`. `cuadrilla-constructor` hace ediciones de 1 o 2 archivos. `cuadrilla-revisor` revisa diffs. Los tres responden comprimido, así que gastan menos contexto.
 
-1. Respuesta primero, sin saludos ni resumen final.
-2. Una idea por oración, voz activa.
-3. Se pueden omitir artículos, pero nunca negaciones ni cifras.
-4. Código, comandos, rutas y errores se copian tal cual.
-5. Sin narración entre pasos de herramientas.
-6. Frases completas en advertencias de seguridad, acciones irreversibles o si el usuario está confundido.
+### Configuración
+
+Modo por defecto: variable `CAVERNICOLA_DEFAULT_MODE`, `.cavernicola.json` en el repo o `~/.config/cavernicola/config.json` (`%APPDATA%\cavernicola\config.json` en Windows):
+
+```json
+{ "defaultMode": "cavernicola-extremo" }
+```
+
+Valores: `cavernicola`, `cavernicola-extremo`, `manual` (arranca apagado; se activa con `/cavernicola`) u `off`.
 
 ### Ejemplo
 
 - **Normal:** "Lo que ocurre es que cada vez que el componente se renderiza se crea un objeto nuevo, y por eso React piensa que la prop cambió y vuelve a renderizar el hijo. Para solucionarlo puedes envolver el valor en useMemo."
-- **Estándar:** "Objeto nuevo en cada render, así que React re-renderiza el hijo. Envolver el valor en `useMemo`."
-- **Extremo:** "Objeto nuevo por render → re-render del hijo. Usar `useMemo`."
+- **Cavernícola:** "Objeto nuevo en cada render, así que React re-renderiza el hijo. Envuelve el valor en `useMemo`."
+- **Extremo:** "Objeto nuevo por render, re-render del hijo. Usar `useMemo`."
+
+### Tests
+
+```bash
+node --test tests/*.js tests/hooks/*.mjs
+python -m pytest tests
+```
+
+En Windows fallan algunos tests que crean symlinks o que quitan `node` del `PATH` de bash. Esos mismos tests también fallan en el repo original en Windows.
 
 ### Licencia
 
@@ -64,53 +95,28 @@ Apache-2.0. Ver [`LICENSE`](LICENSE) y [`NOTICE`](NOTICE).
 
 ## English
 
-**cavernicola** is a Claude skill that makes it answer in **short, direct Spanish** to spend fewer tokens without losing technical content.
+**cavernicola** is a Claude Code plugin that makes Claude answer in **short, direct Spanish**: answer first, no filler, every technical detail kept. It also ships tools for commits, code reviews, memory-file compression, and agents that return compressed results.
 
 ### Origin and authorship
 
-This project is a **derivative adaptation (fork) of [juliusbrussee/caveman](https://github.com/juliusbrussee/caveman)**, licensed under Apache-2.0. The **Spanish port was made 100% by Claude** (Anthropic).
+This project is a **fork of [juliusbrussee/caveman](https://github.com/juliusbrussee/caveman)** (version 4.1.0), licensed under Apache-2.0. All credit for the original idea and code goes to Julius Brussee. The Spanish port was done by Claude (Anthropic).
 
-Notes:
-- It is not a GitHub fork with shared history: it is an independent rewrite.
-- It was written from the original project's public README description. **Its `SKILL.md` was not read**, so the rules are an interpretation and may differ from the original.
-- All credit for the original idea goes to its author. This repo keeps the Apache-2.0 license (see `LICENSE` and `NOTICE`).
-- Only the concise-voice part ("say less") is ported. The original project's other tools (log compression, proxy, CLI, etc.) are **not** included.
+Taken from upstream: the voice, commit, review, help, stats, compress and explore skills, the crew skill and its 3 agents, the Node.js hooks (session-start activation, per-session mode tracking, statusline), the Python compression script with its validation and secret detection, and the matching tests (adapted).
 
-### Installation
+Changed: every skill and agent text is rewritten in Spanish, with Spanish-specific rules and examples. The hooks understand Spanish phrases ("modo cavernícola", "sé conciso", "basta cavernícola", "modo normal"…) as well as the English ones. The `megacave` (Classical Chinese) mode was removed. Names were changed so they don't collide with caveman: `.cavernicola-*` files, `CAVERNICOLA_*` env vars, and config in `~/.config/cavernicola/`.
 
-Copy the `skills/cavernicola` folder into your skills folder. For example, in Claude Code:
+**Not** included: the proxy, engine, CLI, browser extension, Caveman Cloud, the integrations for other editors and the standalone installer.
 
-```bash
-git clone https://github.com/Adraff/cavernicola
-mkdir -p ~/.claude/skills
-cp -r cavernicola/skills/cavernicola ~/.claude/skills/
+### Install (Claude Code)
+
+Requires Node.js 18+ (hooks) and Python 3 (`/cavernicola-comprimir`).
+
+```
+/plugin marketplace add Adraff/cavernicola
+/plugin install cavernicola@cavernicola
 ```
 
-### Usage
-
-| Command | What it does |
-|---|---|
-| `/cavernicola` | Turns on standard mode |
-| `/cavernicola extremo` | Turns on extreme mode |
-| `/cavernicola status` | Shows the active level |
-| `/cavernicola off` | Back to normal style (also: "modo normal") |
-
-It also activates with phrases such as "modo cavernícola", "sé conciso" or "sin relleno". The skill's output is in Spanish.
-
-### Main rules
-
-1. Answer first, no greetings or closing recap.
-2. One idea per sentence, active voice.
-3. Articles may be dropped, but never negations or numbers.
-4. Code, commands, paths and errors are copied exactly.
-5. No narration between tool calls.
-6. Full sentences for security warnings, irreversible actions, or a confused user.
-
-### Example
-
-- **Normal:** "Lo que ocurre es que cada vez que el componente se renderiza se crea un objeto nuevo, y por eso React piensa que la prop cambió y vuelve a renderizar el hijo. Para solucionarlo puedes envolver el valor en useMemo."
-- **Standard:** "Objeto nuevo en cada render, así que React re-renderiza el hijo. Envolver el valor en `useMemo`."
-- **Extreme:** "Objeto nuevo por render → re-render del hijo. Usar `useMemo`."
+If caveman is also installed, disable it so the two plugins don't both instruct the model.
 
 ### License
 
