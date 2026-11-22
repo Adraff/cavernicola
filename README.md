@@ -1,5 +1,7 @@
 # 🪨 cavernicola
 
+> **Fork de / Fork of [juliusbrussee/caveman](https://github.com/juliusbrussee/caveman).** Adaptación al español de la skill *caveman* para Claude. / Spanish adaptation of the *caveman* Claude skill.
+
 [Español](#español) · [English](#english)
 
 ---
@@ -23,7 +25,7 @@ Aclaraciones:
 Copia la carpeta `skills/cavernicola` a tu carpeta de skills. En Claude Code, por ejemplo:
 
 ```bash
-git clone https://github.com/<tu-usuario>/cavernicola
+git clone https://github.com/Adraff/cavernicola
 mkdir -p ~/.claude/skills
 cp -r cavernicola/skills/cavernicola ~/.claude/skills/
 ```
@@ -79,7 +81,7 @@ Notes:
 Copy the `skills/cavernicola` folder into your skills folder. For example, in Claude Code:
 
 ```bash
-git clone https://github.com/<your-username>/cavernicola
+git clone https://github.com/Adraff/cavernicola
 mkdir -p ~/.claude/skills
 cp -r cavernicola/skills/cavernicola ~/.claude/skills/
 ```
